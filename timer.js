@@ -7,6 +7,7 @@ class Timer {
     if(callbacks){
       this.onStart = callbacks.onStart;
       this.onPause = callbacks.onPause;
+      this.onTick = callbacks.onTick;
       this.onComplete = callbacks.onComplete;
     }
     this.startButton.addEventListener('click', this.start);
@@ -15,30 +16,36 @@ class Timer {
   }
 
   start = () => {
-    if(this.timeRemaining < 0){
+    if(this.timeRemaining <= 0){
       console.log("Please enter a time > 0 ");
       this.timeRemaining = 0;
       return;
     }
     if(this.onStart)
-      this.onStart();
-    this.timeRemaining = this.timeRemaining - 1;
-    this.timer = setInterval(this.tick, 1000);
+      this.onStart(this.timeRemaining);
+    this.timeRemaining = this.timeRemaining - 0.05;
+    this.timer = setInterval(this.tick, 50);
   }
 
   pause = () => {
-    f(this.onPause)
+    if(this.onPause)
       this.onPause();
     clearInterval(this.timer);
   }
 
   tick = () => {
-    if(this.timeRemaining > 0)
-      this.timeRemaining = this.timeRemaining - 1;
+    if(this.timeRemaining > 0){
+      this.timeRemaining = this.timeRemaining - 0.05;
+    }
     if(this.timeRemaining == 0){
-      if(this.onComplete)
+      if(this.onComplete){
         this.onComplete();
-      clearInterval(this.timer);
+        clearInterval(this.timer);
+        return;
+      }
+    }
+    if(this.onTick){
+      this.onTick(this.timeRemaining);
     }
   }
 
@@ -47,6 +54,6 @@ class Timer {
   }
 
   set timeRemaining(timeRemaining){
-    this.duration.value = timeRemaining;
+    this.duration.value = timeRemaining.toFixed(2);
   }
 }
